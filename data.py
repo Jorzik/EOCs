@@ -18,11 +18,12 @@ class Data:
 
         self.data: str
 
-        self.data = "01001110 11010001"
-
         # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
         # this function contains code that sets self.data equal
         # to a string of bits that has been retrieved from the given file
+
+        # example:
+        self.data = "01001110 11010001"
 
     def flip(self, amount: int) -> None:
         """flips the data and leaves behind the original to compare to"""
