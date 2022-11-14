@@ -98,3 +98,23 @@ class ExampleAlgorithm(Algorithm):
             fix = self.data.original
 
         return fix
+    
+    
+    
+    
+    
+   
+class ParityCheck(p_check)
+
+
+class CRC(crc)
+
+
+class Checksum(csum)
+
+
+class HammingDistance(h_distance)
+
+
+
+
