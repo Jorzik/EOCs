@@ -98,23 +98,63 @@ class ExampleAlgorithm(Algorithm):
             fix = self.data.original
 
         return fix
-    
-    
-    
-    
-    
-   
-class ParityCheck(p_check)
 
 
-class CRC(crc)
+class ParityCheck(Algorithm):
+    def __init__(self, data: Data) -> None:
+        super().__init__(data)
+
+    def prepare_bits_for_sending(self) -> None:
+
+        pass
+
+    def __call__(self) -> str:
+
+        x = "0"
+
+        return x
 
 
-class Checksum(csum)
+class CRC(Algorithm):
+    def __init__(self, data: Data) -> None:
+        super().__init__(data)
+
+    def prepare_bits_for_sending(self) -> None:
+
+        pass
+
+    def __call__(self) -> str:
+
+        x = "0"
+
+        return x
 
 
-class HammingDistance(h_distance)
+class Checksum(Algorithm):
+    def __init__(self, data: Data) -> None:
+        super().__init__(data)
+
+        def prepare_bits_for_sending(self) -> None:
+
+            pass
+
+        def __call__(self) -> str:
+
+            x = "0"
+
+            return x
 
 
+class HammingDistance(Algorithm):
+    def __init__(self, data: Data) -> None:
+        super().__init__(data)
 
+    def prepare_bits_for_sending(self) -> None:
 
+        pass
+
+    def __call__(self) -> str:
+
+        x = "0"
+
+        return x
