@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import numpy as np
 from data import Data
 
 # ===========================================================================
@@ -46,6 +47,12 @@ class Algorithm(ABC):
         spl_bits = self.data.data.split()
 
         return spl_bits
+
+    def make_multiple_of_n(self, n: int) -> None:
+        """makes sure the data has a length that is a multiple of n"""
+
+        zeros_req: int = 8 - len(self.data.data) % 8
+        self.data.data = "0" * zeros_req + self.data.data
 
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -105,8 +112,32 @@ class ParityCheck(Algorithm):
         super().__init__(data)
 
     def prepare_bits_for_sending(self) -> None:
+        """returns the bits in pairs of 8 + parity bit"""
 
-        pass
+        n_data: str = ""
+
+        # make the data be a multiple of 8
+        self.make_multiple_of_n(8)
+
+        # get the data split
+        spl_data: np.ndarray = np.array(self.split_data)
+
+        # vectorize a one_counter
+        one_counter = np.vectorize(lambda x: len([a for a in x if a == "1"]))
+        count: np.ndarray = one_counter(spl_data)
+
+        # add the parity bits
+        bit: str
+
+        for i in range(len(spl_data)):
+            bit = str(count[i] % 2)
+            spl_data[i] += bit
+
+        # create a complete string from the data
+        for row in spl_data:
+            n_data += row
+
+        self.data.data = n_data
 
     def __call__(self) -> str:
 

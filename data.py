@@ -23,12 +23,12 @@ class Data:
         # to a string of bits that has been retrieved from the given file
 
         # example:
-        self.data = "01001110 11010001"
+        self.data = "111000111000"
+
+        self.original: str = self.data
 
     def flip(self, amount: int) -> None:
         """flips the data and leaves behind the original to compare to"""
-
-        self.original: str = self.data
 
         # flip each bit
         ind_to_flip: int

@@ -21,13 +21,14 @@ import algorithms as algs
 
 class CorrectionAlgs(Enum):
     EXAMPLE_ALGORITHM = algs.ExampleAlgorithm
+    PARITY_CHECK = algs.ParityCheck
 
 
 def main() -> None:
     """Start >>>"""
 
     AMOUNT_TO_FLIP: int = 2
-    CHOSEN_ALG: type = CorrectionAlgs.EXAMPLE_ALGORITHM.value
+    CHOSEN_ALG: type = CorrectionAlgs.PARITY_CHECK.value
 
     # get the data from the file
     data: Data = Data("no file")
