@@ -205,8 +205,9 @@ class ParityCheck(Algorithm):
             new_data += c
 
         # remove excess 0's
+        i_1: int = new_data.find("1")
 
-        return new_data
+        return new_data[i_1:]
 
     def check_horizontally(self, split_data: list) -> list[int]:
         """returns the indices of mistakes"""
