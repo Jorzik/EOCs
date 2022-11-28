@@ -31,12 +31,15 @@ def main() -> None:
     print(f"prepared:  {d.d}")
 
     #'send' the data
-    d.send(1)
+    d.send(0)
     print(f"sent:      {d.d}")
 
     # retrieve the data
-    a()
-    print(f"retrieved: {d.d}")
+    valid: bool = a()
+    if valid:
+        print("valid data")
+    else:
+        print(f"retrieved: {d.d}")
 
     create_divider()
 

@@ -30,6 +30,9 @@ class Data:
     def send(self, amount_to_flip: int) -> None:
         """flips the bits of itself"""
 
+        if not amount_to_flip:
+            return
+
         rng: np.random.Generator = np.random.default_rng()
 
         ind_to_flip: np.ndarray = np.hstack(

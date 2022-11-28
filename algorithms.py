@@ -30,7 +30,7 @@ class Algorithm(ABC):
         """prepares the data for sending"""
 
     @abstractmethod
-    def __call__(self) -> None:
+    def __call__(self) -> bool:
         """'solves' the data"""
 
     def make_multiple_of(self, n: int) -> None:
@@ -69,7 +69,8 @@ class ParityChecking(Algorithm):
 
         self.d.d = w_tot_par.flatten()
 
-    def __call__(self) -> None:
+    def __call__(self) -> bool:
+
         # split the array
         spl_d: np.ndarray = self.split_data(9)
 
@@ -84,10 +85,14 @@ class ParityChecking(Algorithm):
         g *= r
         g *= b
 
+        # validate
+        if r.sum() + b.sum() == 0:
+            return True
+
         # check if possible
         if g.sum() == 0:
             print("not possible")
-            return
+            return False
 
         # remove the parity bits
         v_flip = np.vectorize(lambda x: not x)
@@ -100,6 +105,7 @@ class ParityChecking(Algorithm):
 
         st_ind: int = np.where(self.d.d == 1)[0][0]
         self.d.d = self.d.d[st_ind:]
+        return False
 
 
 class CRC(Algorithm):
@@ -111,7 +117,7 @@ class CRC(Algorithm):
 
         pass
 
-    def __call__(self) -> None:
+    def __call__(self) -> bool:
         """(tries) to retrieve the original data"""
 
         pass
@@ -126,7 +132,7 @@ class Checksum(Algorithm):
 
         pass
 
-    def __call__(self) -> None:
+    def __call__(self) -> bool:
         """(tries) to retrieve the original data"""
 
         pass
@@ -141,7 +147,7 @@ class HammingCode(Algorithm):
 
         pass
 
-    def __call__(self) -> None:
+    def __call__(self) -> bool:
         """(tries) to retrieve the original data"""
 
         pass
