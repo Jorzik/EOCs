@@ -41,16 +41,24 @@ class Data:
         for i in range(amount):
             # determine which bit to flip
             ind_to_flip = self.index_to_flip
-            bit_to_flip = self.data[ind_to_flip]
+            self.data = Data.flip_at(ind_to_flip, self.data)
 
-            # flip the bit
-            # > save the unaffected parts
-            part_1 = self.data[:ind_to_flip]
-            part_2 = self.data[(ind_to_flip + 1) :]
-            flipped_bit = self.flip_a_bit(bit_to_flip)
+    @staticmethod
+    def flip_at(ind: int, data: str) -> str:
+        """flips a bit at the given index"""
 
-            # > reconstruct the bitstring
-            self.data = part_1 + flipped_bit + part_2
+        bit_to_flip = data[ind]
+
+        # flip the bit
+        # > save the unaffected parts
+        part_1 = data[:ind]
+        part_2 = data[(ind + 1) :]
+        flipped_bit = Data.flip_a_bit(bit_to_flip)
+
+        # > reconstruct the bitstring
+        flipped: str = part_1 + flipped_bit + part_2
+
+        return flipped
 
     @property
     def index_to_flip(self) -> int:
@@ -71,7 +79,8 @@ class Data:
 
         return ind_to_flip
 
-    def flip_a_bit(self, bit: str) -> str:
+    @staticmethod
+    def flip_a_bit(bit: str) -> str:
         """flips the chosen bit"""
 
         if bit == "0":

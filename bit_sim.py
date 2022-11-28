@@ -27,7 +27,7 @@ class CorrectionAlgs(Enum):
 def main() -> None:
     """Start >>>"""
 
-    AMOUNT_TO_FLIP: int = 2
+    AMOUNT_TO_FLIP: int = 1
     CHOSEN_ALG: type = CorrectionAlgs.PARITY_CHECK.value
 
     # get the data from the file
