@@ -28,7 +28,7 @@ def main() -> None:
     """Start >>>"""
 
     AMOUNT_TO_FLIP: int = 1
-    CHOSEN_ALG: type = CorrectionAlgs.PARITY_CHECK.value
+    CHOSEN_ALG: type = CorrectionAlgs.EXAMPLE_ALGORITHM.value
 
     # get the data from the file
     data: Data = Data("no file")
