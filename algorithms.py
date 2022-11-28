@@ -1,274 +1,147 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
+import numpy as np
 from data import Data
 
-# ===========================================================================
-#
-#                               INFO
-#
-# ===========================================================================
-
-# This is the algorithm file
-# In here you can create your own algorithm
-
-# To do so:
-# 1. create a class with your algorithm name that inherits from the Algorithm meta class
-# 2. overwrite the 'prepare_bits_for_sending' class and the '__call__' magic method
-# 3. put your preparation code in the 'prepare_bits_for_sending' method
-# 4. put your detect-and-fix code in the magic method
-
-# You can make use of the split_data property to instantly get the data split into bytes
-# If you want to copy a class as a template; copy the ExampleAlgorithm class
+# Kleine tutorial ofso:
+# --------------------
+# 1. gooi je code voor het voorbereiding in je class in de "prepare" method
+# 2. gooi je code voor het repareren in de __call__ method
+# --------------------
+# Er zijn al 2 methods gemaakt die je kan gebruiken:
+# ---
+# 1. self.make_multiple_of:
+#    zorgt ervoor dat de data een lengte krijgt die precies door 'n' gedeelt kan worden
+# 2. self.split_data:
+#    returnt een 2d-array (als in moonstones) met een horizontale lengte van 'n'
+# --------------------
+# Tips:
+# ---
+# - weet dat je in een class werkt en dat je niet alles hoeft mee te geven in parameters
+# - het maken van een func/method werkt ook net iets anders omdat je in een class werkt
 
 
 class Algorithm(ABC):
-    """the base algorithm class"""
-
     def __init__(self, data: Data) -> None:
-        self.data: Data = data
+        self.d: Data = data
 
     @abstractmethod
-    def prepare_bits_for_sending(self) -> None:
-        """prepares the bits for sending"""
-        pass
+    def prepare(self) -> None:
+        """prepares the data for sending"""
 
     @abstractmethod
-    def __call__(self) -> str:
-        """runs the algorithm\n
-        returns the 'fixed' bit-string"""
-        pass
+    def __call__(self) -> None:
+        """'solves' the data"""
 
-    def split_data(self, n: int) -> list[str]:
-        """splits the bit string into n-length parts"""
+    def make_multiple_of(self, n: int) -> None:
+        """adds bits to make self.data a multiple of n"""
 
-        spl_bits: list[str]
+        amount: int = n - len(self.d.d) % n
 
-        # add spaces to the data
-        amount_of_spaces: int = int(len(self.data.data) / n) - 1
-        broken_down_data: list = list(self.data.data)
-        for i in range(amount_of_spaces):
-            broken_down_data.insert((i + 1) * n + i, " ")
+        self.d.d = np.hstack((np.zeros(amount, dtype=int), self.d.d))
 
-        self.data.data = ""
-        for c in broken_down_data:
-            self.data.data += c
+    def split_data(self, n: int) -> np.ndarray:
+        """splits the data into n-length parts"""
 
-        spl_bits = self.data.data.split()
-        self.data.data = self.data.data.replace(" ", "")
+        amount: int = int(len(self.d.d) / n)
 
-        return spl_bits
-
-    def make_multiple_of_n(self, n: int) -> None:
-        """makes sure the data has a length that is a multiple of n"""
-
-        zeros_req: int = n - len(self.data.data) % n
-        self.data.data = "0" * zeros_req + self.data.data
+        return self.d.d.reshape((amount, n))
 
 
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-# An example of an algorithm (with nothing useful in it)
-
-
-class ExampleAlgorithm(Algorithm):
+class ParityChecking(Algorithm):
     def __init__(self, data: Data) -> None:
         super().__init__(data)
 
-    def prepare_bits_for_sending(self) -> None:
-        """prepares the data (self.data.data) for sending"""
+    def prepare(self) -> None:
+        # make multiple of 8
+        self.make_multiple_of(8)
 
-        # >>> this code serves as an example and achieves absolutely nothing
+        # split the data
+        spl_d: np.ndarray = self.split_data(8)
 
-        # makes the data a multiple of 8
-        self.make_multiple_of_n(8)
+        # calculate the right parity bits
+        r: np.ndarray = spl_d.sum(1, dtype=int) % 2
+        w_right_par: np.ndarray = np.hstack((spl_d, r.reshape((spl_d.shape[0], 1))))
 
-        # splits the data to create a list of all bytes
-        bytes: list[str]
+        # calculate the bottom parity bits
+        b: np.ndarray = w_right_par.sum(0, dtype=int) % 2
+        w_tot_par: np.ndarray = np.vstack((w_right_par, b))
 
-        bytes = self.split_data(8)
+        self.d.d = w_tot_par.flatten()
 
-        # adds and removes a bit
-        for byte in bytes:
-            byte += "0"
+    def __call__(self) -> None:
+        # split the array
+        spl_d: np.ndarray = self.split_data(9)
 
-        for byte in bytes:
-            byte = byte[:-1]
+        # check the right side
+        r: np.ndarray = spl_d.sum(1, dtype=int).reshape((spl_d.shape[0], 1)) % 2
 
-        # updates the data
-        new_data: str = ""
+        # check the bottom
+        b: np.ndarray = spl_d.sum(0, dtype=int) % 2
 
-        for byte in bytes:
-            new_data += f"{byte} "
-
-        # - [:-1] to remove the last space
-        self.data.data = new_data[:-1]
-
-    def __call__(self) -> str:
-        """checks if there's an error in the 'received' data and fixes it\n
-        returns the 'fixed' data - does not edit self.data.data"""
-
-        # >>> this code serves as an example and is obviously not allowed
-
-        # error detection
-        error: bool = self.data.data != self.data.original
-
-        # error correction
-        fix: str
-
-        if error:
-            fix = self.data.original
-
-        return fix
-
-
-class ParityCheck(Algorithm):
-    def __init__(self, data: Data) -> None:
-        super().__init__(data)
-
-    def prepare_bits_for_sending(self) -> None:
-        """returns the bits in pairs of 8 + parity bit"""
-
-        n_data: str = ""
-
-        # make the data be a multiple of 8
-        self.make_multiple_of_n(8)
-
-        # get the data split
-        spl_data: list = self.split_data(8)
-
-        # add the parity bits
-        self.add_parity_bits(spl_data)
-
-        # create a complete string from the data
-        for row in spl_data:
-            n_data += row
-
-        self.data.data = n_data
-
-    def add_parity_bits(self, split_data: list) -> list:
-        """adds the parity bits to the list"""
-
-        # > map the one count
-        one_count: list = list(map(ParityCheck.one_counter, split_data))
-
-        # > add the right row
-        bit: str
-
-        for i in range(len(split_data)):
-            bit = str(one_count[i])
-            split_data[i] += bit
-
-        # > add the bottom row
-        row: str = ""
-        for i in range(9):
-            row += self.investigate_index(i, split_data)
-
-        split_data.append(row)
-
-        return split_data
-
-    one_counter = lambda x: len([a for a in x if a == "1"]) % 2
-
-    def investigate_index(self, index: int, split_data: list) -> str:
-        """returns the amount of ones on the given index"""
-
-        count: int = 0
-        for r in split_data:
-            if r[index] == "1":
-                count += 1
-
-        return str(count % 2)
-
-    def __call__(self) -> str:
-
-        spl_data: list = self.split_data(9)
-        data: str = self.data.data
-
-        # find errors
-        wrong_horizontals: list = self.check_horizontally(spl_data)
-        wrong_verticals: list = self.check_vertically(spl_data)
+        # generate a T F grid
+        g: np.ndarray = np.ones(spl_d.shape, dtype=int)
+        g *= r
+        g *= b
 
         # check if possible
-        if min(len(wrong_horizontals), len(wrong_verticals)) != 1:
-            return "not possible"
+        if g.sum() == 0:
+            print("not possible")
+            return
 
-        for a in wrong_horizontals:
-            for b in wrong_verticals:
-                data = Data.flip_at(a * 9 + b, data)
+        # remove the parity bits
+        v_flip = np.vectorize(lambda x: not x)
 
-        # remove parity bits
-        new_data = ""
-        non_parity_chars = [
-            y
-            for x, y in enumerate(data)
-            if x == 0 or (x + 1) % 9 != 0 and x not in range(len(data) - 9, len(data))
-        ]
-        for c in non_parity_chars:
-            new_data += c
+        spl_d[g.astype(bool)] = v_flip(spl_d[g.astype(bool)])
+        spl_d = np.delete(spl_d, spl_d.shape[1] - 1, axis=1)
+        spl_d = np.delete(spl_d, spl_d.shape[0] - 1, axis=0)
 
-        # remove excess 0's
-        i_1: int = new_data.find("1")
+        self.d.d = spl_d.flatten()
 
-        return new_data[i_1:]
-
-    def check_horizontally(self, split_data: list) -> list[int]:
-        """returns the indices of mistakes"""
-
-        # map counter
-        one_count: list = list(map(ParityCheck.one_counter, split_data))
-        wrong_bits = [x for x, y in enumerate(one_count) if y == 1]
-
-        return wrong_bits
-
-    def check_vertically(self, split_data: list) -> list[int]:
-        """returns the indices of mistakes"""
-
-        wrong_bits: list = []
-        for i in range(9):
-            if self.investigate_index(i, split_data) == "1":
-                wrong_bits.append(i)
-
-        return wrong_bits
+        st_ind: int = np.where(self.d.d == 1)[0][0]
+        self.d.d = self.d.d[st_ind:]
 
 
 class CRC(Algorithm):
     def __init__(self, data: Data) -> None:
         super().__init__(data)
 
-    def prepare_bits_for_sending(self) -> None:
+    def prepare(self) -> None:
+        """prepares the data for sending"""
 
         pass
 
-    def __call__(self) -> str:
+    def __call__(self) -> None:
+        """(tries) to retrieve the original data"""
 
-        x = "0"
-
-        return x
+        pass
 
 
 class Checksum(Algorithm):
     def __init__(self, data: Data) -> None:
         super().__init__(data)
 
-        def prepare_bits_for_sending(self) -> None:
-
-            pass
-
-        def __call__(self) -> str:
-
-            x = "0"
-
-            return x
-
-
-class HammingDistance(Algorithm):
-    def __init__(self, data: Data) -> None:
-        super().__init__(data)
-
-    def prepare_bits_for_sending(self) -> None:
+    def prepare(self) -> None:
+        """prepares the data for sending"""
 
         pass
 
-    def __call__(self) -> str:
+    def __call__(self) -> None:
+        """(tries) to retrieve the original data"""
 
-        x = "0"
+        pass
 
-        return x
+
+class HammingCode(Algorithm):
+    def __init__(self, data: Data) -> None:
+        super().__init__(data)
+
+    def prepare(self) -> None:
+        """prepares the data for sending"""
+
+        pass
+
+    def __call__(self) -> None:
+        """(tries) to retrieve the original data"""
+
+        pass
