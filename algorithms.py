@@ -194,7 +194,19 @@ class ParityCheck(Algorithm):
             for b in wrong_verticals:
                 data = Data.flip_at(a * 9 + b, data)
 
-        return data
+        # remove parity bits
+        new_data = ""
+        non_parity_chars = [
+            y
+            for x, y in enumerate(data)
+            if x == 0 or (x + 1) % 9 != 0 and x not in range(len(data) - 9, len(data))
+        ]
+        for c in non_parity_chars:
+            new_data += c
+
+        # remove excess 0's
+
+        return new_data
 
     def check_horizontally(self, split_data: list) -> list[int]:
         """returns the indices of mistakes"""
