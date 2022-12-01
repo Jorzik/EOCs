@@ -25,7 +25,7 @@ def main() -> None:
     print(f"original:  {d.d}")
 
     # prepare the data
-    a: alg.Algorithm = use_algorithm(Algs.PARITY_CHECKING, d)
+    a: alg.Algorithm = use_algorithm(Algs.HAMMING_CODE, d)
 
     a.prepare()
     print(f"prepared:  {d.d}")
