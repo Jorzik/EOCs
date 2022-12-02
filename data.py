@@ -12,17 +12,17 @@ class Data:
 
         file_data: str = self.from_file(origin=origin)
 
-        self.d: np.ndarray = Data.str_to_data(file_data)
+        self.content: np.ndarray = Data.str_to_data(file_data)
 
         # store original data for review
-        self.o: np.ndarray = self.d.copy()
+        self.original: np.ndarray = self.content.copy()
 
     def from_file(self, origin: str) -> str:
         """gets the data from the file as a string of bits"""
 
-        file_open = open("tv_shows.txt") 
-        text = file_open.read() 
-        bin_string = "".join(format(ord(i), '08b') for i in text)
+        file_open = open("tv_shows.txt")
+        text = file_open.read()
+        bin_string = "".join(format(ord(i), "08b") for i in text)
         origin = str(bin_string)
 
         return origin
@@ -40,7 +40,7 @@ class Data:
         ind_to_flip: np.ndarray = np.hstack(
             (
                 np.ones(shape=amount_to_flip, dtype=bool),
-                np.zeros(shape=len(self.d) - amount_to_flip, dtype=bool),
+                np.zeros(shape=len(self.content) - amount_to_flip, dtype=bool),
             )
         )
         # shuffle the indices to flip
@@ -48,4 +48,4 @@ class Data:
 
         # flip the chosen bits
         v_flip = np.vectorize(lambda x: not x)
-        self.d[ind_to_flip] = v_flip(self.d[ind_to_flip])
+        self.content[ind_to_flip] = v_flip(self.content[ind_to_flip])

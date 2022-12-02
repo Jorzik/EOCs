@@ -21,25 +21,25 @@ def main() -> None:
     create_divider()
 
     # obtain the data
-    d: Data = Data("0")
-    print(f"original:  {d.d}")
+    data: Data = Data("0")
+    print(f"original:  {data.content}")
 
     # prepare the data
-    a: alg.Algorithm = use_algorithm(Algs.HAMMING_CODE, d)
+    used_algorithm: alg.Algorithm = use_algorithm(Algs.PARITY_CHECKING, data)
 
-    a.prepare()
-    print(f"prepared:  {d.d}")
+    used_algorithm.prepare()
+    print(f"prepared:  {data.content}")
 
     #'send' the data
-    d.send(0)
-    print(f"sent:      {d.d}")
+    data.send(1)
+    print(f"sent:      {data.content}")
 
     # retrieve the data
-    valid: bool = a()
+    valid: bool = used_algorithm()
     if valid:
         print("valid data")
     else:
-        print(f"retrieved: {d.d}")
+        print(f"retrieved: {data.content}")
 
     create_divider()
 

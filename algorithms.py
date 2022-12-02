@@ -23,7 +23,7 @@ from data import Data
 
 class Algorithm(ABC):
     def __init__(self, data: Data) -> None:
-        self.d: Data = data
+        self.data: Data = data
 
     @abstractmethod
     def prepare(self) -> None:
@@ -36,16 +36,16 @@ class Algorithm(ABC):
     def make_multiple_of(self, n: int) -> None:
         """adds bits to make self.data a multiple of n"""
 
-        amount: int = n - len(self.d.d) % n
+        amount: int = n - len(self.data.content) % n
 
-        self.d.d = np.hstack((np.zeros(amount, dtype=int), self.d.d))
+        self.data.content = np.hstack((np.zeros(amount, dtype=int), self.data.content))
 
     def split_data(self, n: int) -> np.ndarray:
         """splits the data into n-length parts"""
 
-        amount: int = int(len(self.d.d) / n)
+        amount: int = int(len(self.data.content) / n)
 
-        return self.d.d.reshape((amount, n))
+        return self.data.content.reshape((amount, n))
 
 
 class ParityChecking(Algorithm):
@@ -57,55 +57,59 @@ class ParityChecking(Algorithm):
         self.make_multiple_of(8)
 
         # split the data
-        spl_d: np.ndarray = self.split_data(8)
+        split_up_data: np.ndarray = self.split_data(8)
 
         # calculate the right parity bits
-        r: np.ndarray = spl_d.sum(1, dtype=int) % 2
-        w_right_par: np.ndarray = np.hstack((spl_d, r.reshape((spl_d.shape[0], 1))))
+        right_side: np.ndarray = split_up_data.sum(1, dtype=int) % 2
+        data_with_right_parity: np.ndarray = np.hstack(
+            (split_up_data, right_side.reshape((split_up_data.shape[0], 1)))
+        )
 
         # calculate the bottom parity bits
-        b: np.ndarray = w_right_par.sum(0, dtype=int) % 2
-        w_tot_par: np.ndarray = np.vstack((w_right_par, b))
+        bottom: np.ndarray = data_with_right_parity.sum(0, dtype=int) % 2
+        data_with_parity: np.ndarray = np.vstack((data_with_right_parity, bottom))
 
-        self.d.d = w_tot_par.flatten()
+        self.data.content = data_with_parity.flatten()
 
     def __call__(self) -> bool:
 
         # split the array
-        spl_d: np.ndarray = self.split_data(9)
+        split_up_data: np.ndarray = self.split_data(9)
 
         # check the right side
-        r: np.ndarray = spl_d.sum(1, dtype=int).reshape((spl_d.shape[0], 1)) % 2
+        right_side: np.ndarray = (
+            split_up_data.sum(1, dtype=int).reshape((split_up_data.shape[0], 1)) % 2
+        )
 
         # check the bottom
-        b: np.ndarray = spl_d.sum(0, dtype=int) % 2
+        bottom: np.ndarray = split_up_data.sum(0, dtype=int) % 2
 
         # generate a T F grid
-        g: np.ndarray = np.ones(spl_d.shape, dtype=int)
-        g *= r
-        g *= b
+        grid: np.ndarray = np.ones(split_up_data.shape, dtype=int)
+        grid *= right_side
+        grid *= bottom
 
         # validate
-        if r.sum() + b.sum() == 0:
+        if right_side.sum() + bottom.sum() == 0:
             return True
 
         # check if possible
-        if g.sum() == 0:
+        if grid.sum() == 0:
             print("not possible")
             return False
 
         # flip the incorrect bits
         v_flip = np.vectorize(lambda x: not x)
-        spl_d[g.astype(bool)] = v_flip(spl_d[g.astype(bool)])
+        split_up_data[grid.astype(bool)] = v_flip(split_up_data[grid.astype(bool)])
 
         # remove the parity bits
-        spl_d = np.delete(spl_d, spl_d.shape[1] - 1, axis=1)
-        spl_d = np.delete(spl_d, spl_d.shape[0] - 1, axis=0)
+        split_up_data = np.delete(split_up_data, split_up_data.shape[1] - 1, axis=1)
+        split_up_data = np.delete(split_up_data, split_up_data.shape[0] - 1, axis=0)
 
-        self.d.d = spl_d.flatten()
+        self.data.content = split_up_data.flatten()
 
-        st_ind: int = np.where(self.d.d == 1)[0][0]
-        self.d.d = self.d.d[st_ind:]
+        st_ind: int = np.where(self.data.content == 1)[0][0]
+        self.data.content = self.data.content[st_ind:]
         return False
 
 
@@ -198,7 +202,7 @@ class HammingCode(Algorithm):
             return arr
 
         # Enter the data to be transmitted, makes it a usable string
-        bit_array = self.d.d
+        bit_array = self.data.content
         data = "".join(str(i) for i in bit_array)
 
         # Calculate the no of Redundant Bits Required
@@ -215,7 +219,7 @@ class HammingCode(Algorithm):
         # sets self.d.d to the new array to send to next step
 
         dd = np.array([x for x in arr])
-        self.d.d = dd
+        self.data.content = dd
 
         pass
 
@@ -248,7 +252,7 @@ class HammingCode(Algorithm):
             # Convert binary to decimal
             return int(str(res), 2)
 
-        arr = self.d.d
+        arr = self.data.content
 
         # bit_array_receved = self.d.d
         # arr = "".join(str(i) for i in bit_array_receved)
