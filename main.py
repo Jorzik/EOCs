@@ -36,21 +36,18 @@ def main() -> None:
 
     #'send' the data
     data.send(AMOUNT_OF_ERRORS)
-    transferred_data: np.ndarray = data.content
+    data_milestones["transferred_data"] = data.content
 
     # retrieve the data
-    valid: bool = used_algorithm()
-    received_data: np.ndarray
-    if valid:
-        print("valid data")
-    else:
-        received_data = data.content
+    data_milestones = retrieve_data(
+        used_algorithm=used_algorithm, data=data, data_milestones=data_milestones
+    )
 
     # display the results
     print(f"original:  {data_milestones['original_data']}")
     print(f"prepared:  {data_milestones['prepared_data']}")
-    print(f"sent:      {transferred_data}")
-    print(f"retrieved: {received_data}")
+    print(f"sent:      {data_milestones['transferred_data']}")
+    print(f"retrieved: {data_milestones['received_data']}")
 
     create_divider()
 
@@ -65,7 +62,7 @@ def obtain_data(data_milestones: dict) -> tuple:
 
 
 def prepare_data(data: Data, data_milestones: dict) -> tuple:
-    """decides what algorithm will be used"""
+    """decides what algorithm will be used and returns the second milestone"""
 
     used_algorithm: alg.Algorithm = use_algorithm(Algs.PARITY_CHECKING, data)
 
@@ -73,6 +70,26 @@ def prepare_data(data: Data, data_milestones: dict) -> tuple:
     data_milestones["prepared_data"] = data.content
 
     return used_algorithm, data_milestones
+
+
+def retrieve_data(
+    used_algorithm: alg.Algorithm, data: Data, data_milestones: dict
+) -> dict:
+    """(tries) to retrieve the data and returns the third milestone"""
+
+    valid: bool
+    try:
+        valid = used_algorithm()
+    except:
+        print("algorithm could not retrieve the data")
+        valid = False
+
+    if valid:
+        print("valid data")
+        return data_milestones
+
+    data_milestones["received_data"] = data.content
+    return data_milestones
 
 
 def create_divider() -> None:
