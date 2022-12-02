@@ -218,10 +218,10 @@ class HammingCode(Algorithm):
 
         # sets self.d.d to the new array to send to next step
 
-        dd = np.array([x for x in arr])
-        self.data.content = dd
+        self.data.content = Data.str_to_data(arr)
 
-        pass
+
+        pass 
 
     def __call__(self) -> bool:
         def Calc_ammount_of_redund_bits_needed(m):
@@ -252,21 +252,34 @@ class HammingCode(Algorithm):
             # Convert binary to decimal
             return int(str(res), 2)
 
-        arr = self.data.content
-
-        # bit_array_receved = self.d.d
-        # arr = "".join(str(i) for i in bit_array_receved)
-
         m = self.r
 
         r = Calc_ammount_of_redund_bits_needed(m)
 
-        # this check the "fixed data" against the old data
+        arr_old = self.data.content
+        arr = "".join(str(i) for i in arr_old)
+        
+        r = self.r
+  
+        # this check the "fixed data" against the old data 
         correction = find_place_of_error(arr, r)
-        if correction == 0:
-            return True
+        if(correction==0):
+            print("There is no error in the received message.")
         else:
-            print(
-                "The position of error is ", len(arr) - correction + 1, "from the left"
-            )
-            return False
+            print("The position of error is ",len(arr)-correction+1,"from the left")
+        
+        arrar_new = Data.str_to_data(arr)
+
+        place_of_wrong_bit = len(arrar_new)-correction
+        wrong_bit = arrar_new[place_of_wrong_bit]
+
+
+        if wrong_bit == 1:
+            arrar_new[place_of_wrong_bit] = 0
+
+        if wrong_bit == 0:
+            self.data.content[place_of_wrong_bit] = 1
+
+
+
+        pass
