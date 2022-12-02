@@ -29,10 +29,10 @@ def main() -> None:
     data, data_milestones = obtain_data(data_milestones)
 
     # prepare the data
-    used_algorithm: alg.Algorithm = use_algorithm(Algs.PARITY_CHECKING, data)
-
-    used_algorithm.prepare()
-    prepared_data: np.ndarray = data.content
+    used_algorithm: alg.Algorithm
+    used_algorithm, data_milestones = prepare_data(
+        data=data, data_milestones=data_milestones
+    )
 
     #'send' the data
     data.send(AMOUNT_OF_ERRORS)
@@ -48,7 +48,7 @@ def main() -> None:
 
     # display the results
     print(f"original:  {data_milestones['original_data']}")
-    print(f"prepared:  {prepared_data}")
+    print(f"prepared:  {data_milestones['prepared_data']}")
     print(f"sent:      {transferred_data}")
     print(f"retrieved: {received_data}")
 
@@ -62,6 +62,17 @@ def obtain_data(data_milestones: dict) -> tuple:
     data_milestones["original_data"] = data.original
 
     return data, data_milestones
+
+
+def prepare_data(data: Data, data_milestones: dict) -> tuple:
+    """decides what algorithm will be used"""
+
+    used_algorithm: alg.Algorithm = use_algorithm(Algs.PARITY_CHECKING, data)
+
+    used_algorithm.prepare()
+    data_milestones["prepared_data"] = data.content
+
+    return used_algorithm, data_milestones
 
 
 def create_divider() -> None:
