@@ -55,7 +55,10 @@ def main() -> None:
 def obtain_data(data_milestones: dict) -> tuple:
     """obtains the data and returns the first milestone"""
 
+    # create a data instance
     data: Data = Data("0")
+
+    # store a data milestone
     data_milestones["original_data"] = data.original
 
     return data, data_milestones
@@ -64,9 +67,13 @@ def obtain_data(data_milestones: dict) -> tuple:
 def prepare_data(data: Data, data_milestones: dict) -> tuple:
     """decides what algorithm will be used and returns the second milestone"""
 
+    # create an instance of the chosen algorithm
     used_algorithm: alg.Algorithm = use_algorithm(Algs.PARITY_CHECKING, data)
 
+    # prepare the data
     used_algorithm.prepare()
+
+    # store a data milestone
     data_milestones["prepared_data"] = data.content
 
     return used_algorithm, data_milestones
@@ -78,16 +85,21 @@ def retrieve_data(
     """(tries) to retrieve the data and returns the third milestone"""
 
     valid: bool
+
+    # try-except serves for catching errors related to
+    # the algorithm not being designed for handling larger amounts of errors
     try:
         valid = used_algorithm()
     except:
         print("algorithm could not retrieve the data")
         valid = False
 
+    # handles the result of the error detection
     if valid:
         print("valid data")
         return data_milestones
 
+    # stores a milestone of the data
     data_milestones["received_data"] = data.content
     return data_milestones
 
