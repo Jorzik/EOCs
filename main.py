@@ -6,82 +6,78 @@ from enum import Enum
 import numpy as np
 
 
-class Algs(Enum):
+class AlgorithmPicker(Enum):
     PARITY_CHECKING = alg.ParityChecking
     CHECKSUM = alg.Checksum
     CRC = alg.CRC
     HAMMING_CODE = alg.HammingCode
 
 
-use_algorithm: Callable[[Algs, Data], alg.Algorithm] = lambda x, y: x.value(y)
+use_algorithm: Callable[[AlgorithmPicker, Data], alg.Algorithm] = lambda x, y: x.value(
+    y
+)
 
 
 def main() -> None:
     """Start >>>"""
 
     AMOUNT_OF_ERRORS: int = 1
-    data_milestones: dict[str, np.ndarray] = {}
+    data_milest: dict[str, np.ndarray] = {}
 
     create_divider()
 
     # obtain the data
     data: Data
-    data, data_milestones = obtain_data(data_milestones=data_milestones)
+    data, data_milest = obtain_data(data_milest=data_milest)
 
     # prepare the data
-    used_algorithm: alg.Algorithm
-    used_algorithm, data_milestones = prepare_data(
-        data=data, data_milestones=data_milestones
-    )
+    used_alg: alg.Algorithm
+    used_alg, data_milest = prepare_data(data=data, data_milest=data_milest)
 
     #'send' the data
     data.send(AMOUNT_OF_ERRORS)
-    data_milestones["transferred_data"] = data.content
+    data_milest["transferred_data"] = data.content
 
     # retrieve the data
-    data_milestones = retrieve_data(
-        used_algorithm=used_algorithm, data=data, data_milestones=data_milestones
-    )
+    data_milest = retrieve_data(used_alg=used_alg, data=data, data_milest=data_milest)
 
     # display the results
-    print(f"original:  {data_milestones['original_data']}")
-    print(f"prepared:  {data_milestones['prepared_data']}")
-    print(f"sent:      {data_milestones['transferred_data']}")
-    print(f"retrieved: {data_milestones['received_data']}")
+    print(f"original:  {data_milest['original_data']}")
+    print(f"prepared:  {data_milest['prepared_data']}")
+    print(f"sent:      {data_milest['transferred_data']}")
+    print(f"retrieved: {data_milest['received_data']}")
 
     create_divider()
 
 
-def obtain_data(data_milestones: dict) -> tuple:
+def obtain_data(data_milest: dict) -> tuple:
     """obtains the data and returns the first milestone"""
 
     # create a data instance
     data: Data = Data("0")
 
     # store a data milestone
-    data_milestones["original_data"] = data.original
+    data_milest["original_data"] = data.original
 
-    return data, data_milestones
+    return data, data_milest
 
 
-def prepare_data(data: Data, data_milestones: dict) -> tuple:
+def prepare_data(data: Data, data_milest: dict) -> tuple:
     """decides what algorithm will be used and returns the second milestone"""
 
     # create an instance of the chosen algorithm
-    used_algorithm: alg.Algorithm = use_algorithm(Algs.PARITY_CHECKING, data)
+    used_alg: alg.Algorithm = use_algorithm(AlgorithmPicker.PARITY_CHECKING, data)
 
     # prepare the data
-    used_algorithm.prepare()
+    used_alg.prepare()
 
     # store a data milestone
-    data_milestones["prepared_data"] = data.content
+    data_milest["prepared_data"] = data.content
 
-    return used_algorithm, data_milestones
+    return used_alg, data_milest
 
 
-def retrieve_data(
-    used_algorithm: alg.Algorithm, data: Data, data_milestones: dict
-) -> dict:
+def retrieve_data(used_alg: alg.Algorithm, data: Data, data_milest: dict) -> dict:
     """(tries) to retrieve the data and returns the third milestone"""
 
     valid: bool
@@ -89,7 +85,7 @@ def retrieve_data(
     # try-except serves for catching errors related to
     # the algorithm not being designed for handling larger amounts of errors
     try:
-        valid = used_algorithm()
+        valid = used_alg()
     except:
         print("algorithm could not retrieve the data")
         valid = False
@@ -97,11 +93,11 @@ def retrieve_data(
     # handles the result of the error detection
     if valid:
         print("valid data")
-        return data_milestones
+        return data_milest
 
     # stores a milestone of the data
-    data_milestones["received_data"] = data.content
-    return data_milestones
+    data_milest["received_data"] = data.content
+    return data_milest
 
 
 def create_divider() -> None:

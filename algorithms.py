@@ -60,16 +60,16 @@ class ParityChecking(Algorithm):
         split_up_data: np.ndarray = self.split_data(8)
 
         # calculate the right parity bits
-        right_side: np.ndarray = split_up_data.sum(1, dtype=int) % 2
-        data_with_right_parity: np.ndarray = np.hstack(
-            (split_up_data, right_side.reshape((split_up_data.shape[0], 1)))
+        r_side: np.ndarray = split_up_data.sum(1, dtype=int) % 2
+        data_with_r_parity: np.ndarray = np.hstack(
+            (split_up_data, r_side.reshape((split_up_data.shape[0], 1)))
         )
 
         # calculate the bottom parity bits
-        bottom: np.ndarray = data_with_right_parity.sum(0, dtype=int) % 2
-        data_with_parity: np.ndarray = np.vstack((data_with_right_parity, bottom))
+        bottom: np.ndarray = data_with_r_parity.sum(0, dtype=int) % 2
+        data_with_par: np.ndarray = np.vstack((data_with_r_parity, bottom))
 
-        self.data.content = data_with_parity.flatten()
+        self.data.content = data_with_par.flatten()
 
     def __call__(self) -> bool:
 
@@ -77,7 +77,7 @@ class ParityChecking(Algorithm):
         split_up_data: np.ndarray = self.split_data(9)
 
         # check the right side
-        right_side: np.ndarray = (
+        r_side: np.ndarray = (
             split_up_data.sum(1, dtype=int).reshape((split_up_data.shape[0], 1)) % 2
         )
 
@@ -86,11 +86,11 @@ class ParityChecking(Algorithm):
 
         # generate a T F grid
         grid: np.ndarray = np.ones(split_up_data.shape, dtype=int)
-        grid *= right_side
+        grid *= r_side
         grid *= bottom
 
         # validate
-        if right_side.sum() + bottom.sum() == 0:
+        if r_side.sum() + bottom.sum() == 0:
             return True
 
         # check if possible
