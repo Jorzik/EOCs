@@ -26,7 +26,7 @@ def main() -> None:
 
     # obtain the data
     data: Data
-    data, data_milestones = obtain_data(data_milestones)
+    data, data_milestones = obtain_data(data_milestones=data_milestones)
 
     # prepare the data
     used_algorithm: alg.Algorithm
