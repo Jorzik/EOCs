@@ -21,7 +21,7 @@ def main() -> None:
     create_divider()
 
     # obtain the data
-    d: Data = Data("111000111000")
+    d: Data = Data("0")
     print(f"original:  {d.d}")
 
     # prepare the data

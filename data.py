@@ -20,9 +20,11 @@ class Data:
     def from_file(self, origin: str) -> str:
         """gets the data from the file as a string of bits"""
 
-        # VALENTIJN: --------------------------------------------------------------------------------------------------------------
+        file_open = open("tv_shows.txt") 
+        text = file_open.read() 
+        bin_string = "".join(format(ord(i), '08b') for i in text)
+        origin = str(bin_string)
 
-        # placeholder:
         return origin
 
     str_to_data: Callable[[str], np.ndarray] = lambda x: np.array([int(q) for q in x])
