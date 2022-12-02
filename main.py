@@ -36,7 +36,7 @@ def main() -> None:
 
     #'send' the data
     data.send(AMOUNT_OF_ERRORS)
-    data_milest["transferred_data"] = data.content
+    data_milest["transferred_data"] = data.content.copy()
 
     # retrieve the data
     data_milest = retrieve_data(used_alg=used_alg, data=data, data_milest=data_milest)
@@ -72,7 +72,7 @@ def prepare_data(data: Data, data_milest: dict) -> tuple:
     used_alg.prepare()
 
     # store a data milestone
-    data_milest["prepared_data"] = data.content
+    data_milest["prepared_data"] = data.content.copy()
 
     return used_alg, data_milest
 
@@ -96,7 +96,7 @@ def retrieve_data(used_alg: alg.Algorithm, data: Data, data_milest: dict) -> dic
         return data_milest
 
     # stores a milestone of the data
-    data_milest["received_data"] = data.content
+    data_milest["received_data"] = data.content.copy()
     return data_milest
 
 
