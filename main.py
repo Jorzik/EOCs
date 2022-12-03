@@ -66,7 +66,7 @@ def prepare_data(data: Data, data_milest: dict) -> tuple:
     """decides what algorithm will be used and returns the second milestone"""
 
     # create an instance of the chosen algorithm
-    used_alg: alg.Algorithm = use_algorithm(AlgorithmPicker.PARITY_CHECKING, data)
+    used_alg: alg.Algorithm = use_algorithm(AlgorithmPicker.CRC, data)
 
     # prepare the data
     used_alg.prepare()

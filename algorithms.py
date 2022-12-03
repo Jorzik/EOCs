@@ -119,8 +119,14 @@ class CRC(Algorithm):
 
     def prepare(self) -> None:
         """prepares the data for sending"""
-
+        a = self.data.content
+        self.hello_world(10)
+        self.b = "Hallo"
         pass
+
+    def hello_world(self, a):
+        print(a)
+        print(self.b)
 
     def __call__(self) -> bool:
         """(tries) to retrieve the original data"""
