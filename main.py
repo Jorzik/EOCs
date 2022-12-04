@@ -84,11 +84,12 @@ def retrieve_data(used_alg: alg.Algorithm, data: Data, data_milest: dict) -> dic
 
     # try-except serves for catching errors related to
     # the algorithm not being designed for handling larger amounts of errors
-    #try:
-     #   valid = used_alg()
-    #except:
-     #   print("algorithm could not retrieve the data")
-      #  valid = False
+    # try:
+    #     valid = used_alg()
+    # except:
+    #     print("algorithm could not retrieve the data")
+    #     valid = False
+
     valid = used_alg()
 
     data_milest["received_data"] = data.content.copy()
@@ -99,7 +100,7 @@ def retrieve_data(used_alg: alg.Algorithm, data: Data, data_milest: dict) -> dic
         return data_milest
 
     # stores a milestone of the data
-    
+    print("invalid data")
     return data_milest
 
 
