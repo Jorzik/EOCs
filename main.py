@@ -100,7 +100,7 @@ def retrieve_data(used_alg: alg.Algorithm, data: Data, data_milest: dict) -> dic
         return data_milest
 
     # stores a milestone of the data
-
+    print("invalid data")
     return data_milest
 
 
